@@ -15,6 +15,12 @@
       "type": "portals"
     },
     {
+      "id": "comingSoonAvailabilityBarTablet",
+      "path": "frontend/portals/AvailabilityBarTablet/index.jsx",
+      "target": "product.tablet.right-column.add-to-cart",
+      "type": "portals"
+    },
+    {
       "id": "comingSoonFavoritesNotice",
       "path": "frontend/portals/FavoritesNotice/index.jsx",
       "target": "favorites.product-name.after",

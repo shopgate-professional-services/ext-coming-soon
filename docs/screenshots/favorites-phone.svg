@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="600" viewBox="0 0 320 600" font-family="-apple-system,Segoe UI,Roboto,sans-serif">
+  <rect width="320" height="600" rx="18" fill="#ffffff" stroke="#e2e4e8"/>
+  <text x="160" y="44" text-anchor="middle" font-size="15" font-weight="700" fill="#1d1d1d">Merkliste</text>
+  <line x1="0" y1="64" x2="320" y2="64" stroke="#eee"/>
+
+  <!-- normal favourite row -->
+  <rect x="20" y="86" width="64" height="64" rx="8" fill="#e9ebee"/>
+  <text x="100" y="108" font-size="14" font-weight="600" fill="#1d1d1d">Sneaker „Classic"</text>
+  <text x="100" y="130" font-size="13" fill="#444">89,90 €</text>
+  <line x1="20" y1="174" x2="300" y2="174" stroke="#f0f0f0"/>
+
+  <!-- coming-soon favourite row: add-to-cart hidden, notice appended -->
+  <rect x="20" y="196" width="64" height="64" rx="8" fill="#e9ebee"/>
+  <text x="100" y="218" font-size="14" font-weight="600" fill="#1d1d1d">Sneaker „Future Edition"</text>
+  <rect x="100" y="228" width="86" height="18" rx="4" fill="#FA5400" fill-opacity="0.14"/>
+  <text x="108" y="241" font-size="11" font-weight="700" fill="#b14a1e">coming soon</text>
+  <text x="100" y="262" font-size="13" fill="#444">119,00 €</text>
+  <!-- favorites.product-name.after notice -->
+  <text x="100" y="282" font-size="13" font-weight="700" fill="#7a4a12">Verfügbar ab 24. Dezember 2026</text>
+  <line x1="20" y1="306" x2="300" y2="306" stroke="#f0f0f0"/>
+
+  <text x="160" y="560" text-anchor="middle" font-size="11" fill="#aab0b6">Add-to-Cart ausgeblendet · Hinweis angehängt</text>
+</svg>

@@ -1,37 +1,82 @@
 # @shopgate-project/ext-coming-soon
 
-Hides the add-to-cart action for products whose `firstAvailableDate` lies in
-the future, and shows an **"Available on &lt;date&gt;"** bar on the PDP plus a
-short notice on the favourites list. Over-the-air deploy, no native change.
+Replaces the **add-to-cart** action with an **"Available on &lt;date&gt;"** bar
+for products that are not yet purchasable (their first-availability date lies in
+the future), and shows a short availability notice on the favourites list.
+Works on **phone and tablet**. Over-the-air deploy, no native change.
 
-Custom (project-scope) extension for Shopgate Engage / PWA 7.x.
+> **Type: Custom** — a project/merchant-specific extension (`@shopgate-project/…`
+> scope), **not** a core Shopgate feature.
+
+Built for **Shopgate Engage / PWA 7.x** (`theme-ios11`, and `theme-ios11-tablet`
+via [`ext-tablet-adjustments`](https://github.com/shopgate-professional-services/ext-tablet-adjustments)).
+
+## Screenshots
+
+| Phone — PDP | Phone — favourites | Tablet — PDP |
+|---|---|---|
+| ![PDP phone](docs/screenshots/pdp-phone.svg) | ![Favourites](docs/screenshots/favorites-phone.svg) | ![PDP tablet](docs/screenshots/pdp-tablet.svg) |
+
+> The images are illustrations that reflect the live-verified rendering (real
+> theme colours + locale text). Replace with real PNG screenshots under
+> `docs/screenshots/` when convenient.
+
+## What it does
+
+For a product whose `firstAvailableDate` is in the future ("coming soon"):
+
+- **PDP (phone):** the bottom add-to-cart bar is replaced by a greyed
+  "available on &lt;date&gt;" bar.
+- **PDP (tablet):** the right-column add-to-cart button is replaced by the same
+  greyed bar (tablet places add-to-cart in the right column, not the bottom).
+- **PDP inline CTA & favourites add-to-cart:** hidden.
+- **Favourites list:** an availability notice is appended after the product name.
+
+For all other products nothing changes — the original add-to-cart renders
+untouched.
 
 ## How it works
 
 ### Frontend (portals)
 
-Portal components are registered via `components` in
-[`extension-config.json`](extension-config.json):
+Each portal component is registered via `components` in
+[`extension-config.json`](extension-config.json). A component registered at a
+portal name overrides the theme's default `children` and receives them as a
+prop, so non-coming-soon products simply get their original content back.
 
-| Portal | Coming-soon behaviour | Normal product |
-|---|---|---|
-| `product.ctas.add-to-cart` | hide (render nothing) | renders default children |
-| `product.add-to-cart-bar` | show the availability bar | renders default children |
-| `favorites.add-to-cart` | hide (render nothing) | renders default children |
-| `favorites.product-name.after` | append availability notice | renders nothing (additive slot) |
+| Portal | Surface | Coming-soon | Otherwise |
+|---|---|---|---|
+| `product.ctas.add-to-cart` | PDP inline CTA | hide | children |
+| `product.add-to-cart-bar` | PDP bottom bar (phone) | availability bar | children · `null` on tablet |
+| `product.tablet.right-column.add-to-cart` | PDP right column (tablet) | availability bar | children |
+| `favorites.add-to-cart` | favourites list | hide | children |
+| `favorites.product-name.after` | favourites list | availability notice | nothing |
 
-Replace mechanism: a component registered at a portal name overrides the
-theme's default `children` and receives them as a prop; the shared
-`ComingSoonGuard` returns them unchanged for normal products, so
-non-coming-soon items are untouched.
+The shared connector ([`frontend/connector.js`](frontend/connector.js)) injects
+`product` (via `getProduct`, variant-aware) and `isTablet` (via
+`getDeviceInformation`).
 
-The availability bar mirrors the theme's add-to-cart bar 1:1 (container,
-inner padding, bar height, button styles — all taken from `themeConfig`, so
-it follows the merchant's colours automatically) and is greyed out via a
-configurable opacity.
+### Tablet support
 
-Variant handling: the shared connector uses `getProduct(state, props)`, which
-resolves the product for the current route and the selected variant.
+On tablet the add-to-cart lives in the product **right column**
+(`product.tablet.right-column.add-to-cart`, provided by the tablet layout /
+`ext-tablet-adjustments`, which also passes `productId`/`variantId` into the
+portal) and the bottom `product.add-to-cart-bar` is nullified. This extension
+therefore:
+
+- registers an availability bar at `product.tablet.right-column.add-to-cart`
+  ([`ComingSoonBarTablet`](frontend/components/ComingSoonBarTablet/index.jsx),
+  styled like the tablet add-to-cart button), and
+- makes the bottom-bar guard render `null` on tablet, so there is never a
+  duplicate or misplaced bar regardless of portal registration order.
+
+### Styling
+
+The bars mirror the corresponding theme add-to-cart button 1:1 — colours,
+font, radius, padding (and on phone the full bar container, shadow and
+safe-area) — all read from `themeConfig`, so they automatically follow the
+merchant's theme colours. The only visual difference is a configurable
+`opacity` that greys the bar out to read as "not purchasable".
 
 ### Backend (pipeline hook step)
 
@@ -43,38 +88,41 @@ under `steps` in `extension-config.json`):
 - `shopgate.catalog.getProductsByCategory.v1` (lists)
 - `shopgate.catalog.getProductsByIds.v1` (favourites)
 
-It receives `products`, writes a top-level `firstAvailableDate` onto each
-product, and returns them. It first reads an already-delivered date
-(top-level or `customData.firstAvailableDate`).
+It receives `products`, writes a top-level `firstAvailableDate` onto each one
+(this is what the frontend reads), and returns them. It first looks for an
+already-delivered date (top-level or `customData.firstAvailableDate`).
 
 > ⚠️ **DEV MOCK:** products without a delivered date currently fall back to a
 > fixed future date in `enrichFirstAvailableDate.js` — **remove before
-> production** (see open items: the real data source still needs to be
-> modelled, e.g. an SW6 custom field).
+> production** once the real data source is modelled (see open items).
 
 ### Configuration
 
 | Key | Type | Default | Description |
 |---|---|---|---|
-| `comingSoonBarOpacity` | admin / number | `0.6` | Greyness of the availability bar (0–1). Delivered to `frontend/config.json`; the component falls back to `0.6` when unset. |
+| `comingSoonBarOpacity` | admin / number | `0.6` | Greyness of the availability bar (0–1). Set in the Developer Center; delivered to `frontend/config.json`; the component falls back to `0.6` when unset. |
 
 ## Structure
 
 ```
 extension/
-└── enrichFirstAvailableDate.js     # afterFetchProducts hook step (backend)
+└── enrichFirstAvailableDate.js        # afterFetchProducts hook step (backend)
 frontend/
-├── connector.js                    # shared connect (getProduct, variant-aware)
-├── helpers/isComingSoon.js         # isComingSoon() + formatAvailableDate()
+├── connector.js                       # shared connect: product (variant-aware) + isTablet
+├── helpers/
+│   ├── isComingSoon.js                # isComingSoon() + formatAvailableDate()
+│   └── barOpacity.js                  # resolves the configurable opacity
 ├── components/
-│   ├── ComingSoonGuard/            # render bar/notice vs. original children
-│   ├── ComingSoonBar/              # the PDP bar (theme-styled, opacity-configurable)
-│   └── FavoritesNotice/            # the favourites notice
+│   ├── ComingSoonGuard/               # render coming-soon output vs. original children
+│   ├── ComingSoonBar/                 # phone PDP bottom bar (theme add-to-cart bar)
+│   ├── ComingSoonBarTablet/           # tablet right-column bar (theme add-to-cart button)
+│   └── FavoritesNotice/               # favourites availability notice
 ├── portals/
-│   ├── HideAddToCart/              # product.ctas.add-to-cart + favorites.add-to-cart
-│   ├── AvailabilityBar/            # product.add-to-cart-bar
-│   └── FavoritesNotice/            # favorites.product-name.after
-└── locale/{en-US,de-DE}.json       # "Available on {date}" / "Verfügbar ab {date}"
+│   ├── HideAddToCart/                 # product.ctas.add-to-cart + favorites.add-to-cart
+│   ├── AvailabilityBar/               # product.add-to-cart-bar (phone; null on tablet)
+│   ├── AvailabilityBarTablet/         # product.tablet.right-column.add-to-cart
+│   └── FavoritesNotice/               # favorites.product-name.after
+└── locale/{en-US,de-DE}.json          # "Available on {date}" / "Verfügbar ab {date}"
 ```
 
 ## Run / test locally
@@ -85,12 +133,12 @@ sgconnect frontend start   # webpack dev server (PWA)
 ```
 
 Unit specs (`*.spec.js[x]`) follow the standard Shopgate jest/enzyme setup
-(`npm test` in `frontend/` once dev dependencies are installed).
+(`npm test` in `frontend/`).
 
 ## Open items before production
 
-1. **Model the real date source** (per merchant): e.g. an SW6 custom field
-   surfaced into the product (then `readDeliveredDate()` picks it up), and
+1. **Model the real date source** (per merchant): e.g. a Shopware custom field
+   surfaced onto the product (then `readDeliveredDate()` picks it up), and
    **remove the DEV MOCK fallback** in `extension/enrichFirstAvailableDate.js`.
 2. **Variant-level vs product-level availability** — clarify whether the date
    differs per variant.
