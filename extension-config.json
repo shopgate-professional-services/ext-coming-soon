@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "id": "@shopgate-project/ext-coming-soon",
+  "components": [
+    {
+      "id": "comingSoonHideAddToCart",
+      "path": "frontend/portals/HideAddToCart/index.jsx",
+      "target": ["product.ctas.add-to-cart", "favorites.add-to-cart"],
+      "type": "portals"
+    },
+    {
+      "id": "comingSoonAvailabilityBar",
+      "path": "frontend/portals/AvailabilityBar/index.jsx",
+      "target": "product.add-to-cart-bar",
+      "type": "portals"
+    },
+    {
+      "id": "comingSoonFavoritesNotice",
+      "path": "frontend/portals/FavoritesNotice/index.jsx",
+      "target": "favorites.product-name.after",
+      "type": "portals"
+    },
+    {
+      "id": "en-US",
+      "path": "frontend/locale/en-US.json",
+      "type": "translations"
+    },
+    {
+      "id": "de-DE",
+      "path": "frontend/locale/de-DE.json",
+      "type": "translations"
+    }
+  ],
+  "steps": [
+    {
+      "path": "extension/enrichFirstAvailableDate.js",
+      "description": "Enrich products with a top-level firstAvailableDate",
+      "hooks": [
+        "shopgate.catalog.getProduct.v1:afterFetchProducts",
+        "shopgate.catalog.getProductsByCategory.v1:afterFetchProducts",
+        "shopgate.catalog.getProductsByIds.v1:afterFetchProducts"
+      ],
+      "input": [{ "key": "products" }],
+      "output": [{ "key": "products" }]
+    }
+  ],
+  "configuration": {
+    "comingSoonBarOpacity": {
+      "type": "admin",
+      "destination": "frontend",
+      "default": 0.6,
+      "params": {
+        "type": "number",
+        "label": "Coming-soon bar opacity (0–1, e.g. 0.6 = slightly greyed)",
+        "default": "0.6"
+      }
+    }
+  }
+}
