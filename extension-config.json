@@ -11,7 +11,7 @@
     {
       "id": "comingSoonAvailabilityBar",
       "path": "frontend/portals/AvailabilityBar/index.jsx",
-      "target": "product.add-to-cart-bar",
+      "target": "product.add-to-cart-bar.before",
       "type": "portals"
     },
     {

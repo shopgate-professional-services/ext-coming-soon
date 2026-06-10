@@ -40,14 +40,15 @@ untouched.
 ### Frontend (portals)
 
 Each portal component is registered via `components` in
-[`extension-config.json`](extension-config.json). A component registered at a
-portal name overrides the theme's default `children` and receives them as a
-prop, so non-coming-soon products simply get their original content back.
+[`extension-config.json`](extension-config.json). An override component
+(registered at a portal name) receives the theme's default `children` and
+returns them unchanged for non-coming-soon products. The phone bottom bar uses
+the additive `.before` slot instead (see Coexistence below).
 
 | Portal | Surface | Coming-soon | Otherwise |
 |---|---|---|---|
 | `product.ctas.add-to-cart` | PDP inline CTA | hide | children |
-| `product.add-to-cart-bar` | PDP bottom bar (phone) | availability bar | children · `null` on tablet |
+| `product.add-to-cart-bar.before` | PDP bottom bar (phone) | availability bar + hide real bar | nothing |
 | `product.tablet.right-column.add-to-cart` | PDP right column (tablet) | availability bar | children |
 | `favorites.add-to-cart` | favourites list | hide | children |
 | `favorites.product-name.after` | favourites list | availability notice | nothing |
@@ -67,8 +68,19 @@ therefore:
 - registers an availability bar at `product.tablet.right-column.add-to-cart`
   ([`ComingSoonBarTablet`](frontend/components/ComingSoonBarTablet/index.jsx),
   styled like the tablet add-to-cart button), and
-- makes the bottom-bar guard render `null` on tablet, so there is never a
-  duplicate or misplaced bar regardless of portal registration order.
+- renders nothing in the phone bottom-bar slot on tablet, so there is never a
+  duplicate or misplaced bar.
+
+### Coexistence with other extensions
+
+`ext-tablet-adjustments` also targets `product.add-to-cart-bar` (to nullify it
+on tablet). When two extensions register an **override** at the same portal,
+only the last one wins (by registration order, which a single extension can't
+control). To stay robust regardless of order, this extension does **not**
+override `product.add-to-cart-bar`; instead it renders the phone bar in the
+additive `product.add-to-cart-bar.before` slot and hides the real bar
+(`.theme__product__add-to-cart-bar`) via a scoped style only while a coming-soon
+product is shown. Verified working with `ext-tablet-adjustments` installed.
 
 ### Styling
 
