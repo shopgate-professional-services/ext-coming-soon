@@ -90,23 +90,11 @@ safe-area) — all read from `themeConfig`, so they automatically follow the
 merchant's theme colours. The only visual difference is a configurable
 `opacity` that greys the bar out to read as "not purchasable".
 
-### Backend (pipeline hook step)
+### Data source
 
-[`extension/enrichFirstAvailableDate.js`](extension/enrichFirstAvailableDate.js)
-hooks into the catalog pipelines' `afterFetchProducts` hook point (declared
-under `steps` in `extension-config.json`):
-
-- `shopgate.catalog.getProduct.v1` (PDP)
-- `shopgate.catalog.getProductsByCategory.v1` (lists)
-- `shopgate.catalog.getProductsByIds.v1` (favourites)
-
-It receives `products`, writes a top-level `firstAvailableDate` onto each one
-(this is what the frontend reads), and returns them. It first looks for an
-already-delivered date (top-level or `customData.firstAvailableDate`).
-
-> ⚠️ **DEV MOCK:** products without a delivered date currently fall back to a
-> fixed future date in `enrichFirstAvailableDate.js` — **remove before
-> production** once the real data source is modelled (see open items).
+The extension reads the product's top-level `firstAvailableDate`, which is
+already delivered by the core catalog (`shopgate.catalog.getProduct.v1`). No
+backend step is required — this is a frontend-only extension.
 
 ### Configuration
 
@@ -117,8 +105,6 @@ already-delivered date (top-level or `customData.firstAvailableDate`).
 ## Structure
 
 ```
-extension/
-└── enrichFirstAvailableDate.js        # afterFetchProducts hook step (backend)
 frontend/
 ├── connector.js                       # shared connect: product (variant-aware) + isTablet
 ├── helpers/
@@ -140,7 +126,7 @@ frontend/
 ## Run / test locally
 
 ```bash
-sgconnect backend start    # runs the hook step locally, proxies pipelines
+sgconnect backend start    # proxies pipelines (catalog data incl. firstAvailableDate)
 sgconnect frontend start   # webpack dev server (PWA)
 ```
 
@@ -149,12 +135,9 @@ Unit specs (`*.spec.js[x]`) follow the standard Shopgate jest/enzyme setup
 
 ## Open items before production
 
-1. **Model the real date source** (per merchant): e.g. a Shopware custom field
-   surfaced onto the product (then `readDeliveredDate()` picks it up), and
-   **remove the DEV MOCK fallback** in `extension/enrichFirstAvailableDate.js`.
-2. **Variant-level vs product-level availability** — clarify whether the date
+1. **Variant-level vs product-level availability** — clarify whether the date
    differs per variant.
-3. **Timezone:** the future-check uses device-local time; confirm that matches
+2. **Timezone:** the future-check uses device-local time; confirm that matches
    the merchant's intent.
-4. **Scope:** PDP + favourites only. PLP add-to-cart, product sliders and cart
+3. **Scope:** PDP + favourites only. PLP add-to-cart, product sliders and cart
    are out of scope — confirm.

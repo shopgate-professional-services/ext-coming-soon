@@ -1,7 +1,0 @@
-{
-  "name": "@shopgate-project/ext-coming-soon-backend",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Backend steps of @shopgate-project/ext-coming-soon (afterFetchProducts enrich)",
-  "dependencies": {}
-}

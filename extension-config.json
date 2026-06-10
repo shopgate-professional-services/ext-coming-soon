@@ -37,19 +37,6 @@
       "type": "translations"
     }
   ],
-  "steps": [
-    {
-      "path": "extension/enrichFirstAvailableDate.js",
-      "description": "Enrich products with a top-level firstAvailableDate",
-      "hooks": [
-        "shopgate.catalog.getProduct.v1:afterFetchProducts",
-        "shopgate.catalog.getProductsByCategory.v1:afterFetchProducts",
-        "shopgate.catalog.getProductsByIds.v1:afterFetchProducts"
-      ],
-      "input": [{ "key": "products" }],
-      "output": [{ "key": "products" }]
-    }
-  ],
   "configuration": {
     "comingSoonBarOpacity": {
       "type": "admin",
