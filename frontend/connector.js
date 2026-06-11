@@ -4,18 +4,29 @@ import { getDeviceInformation } from '@shopgate/pwa-common/selectors/client';
 
 /**
  * Maps the current application state to the component props.
- * - `getProduct(state, props)` resolves the product for the current route and
- *   respects the selected variant (it reads the resolved product id, which is
- *   the variant id when a variant is selected).
- * - `isTablet` lets the bottom add-to-cart-bar guard stand down on tablets,
- *   where the add-to-cart lives in the right column (see AvailabilityBarTablet).
+ *
+ * - **`product`** via `getProduct(state, props)`. The product id comes from the
+ *   portal props, which differ per slot:
+ *     - PDP add-to-cart slots pass `productId` (route/variant resolution).
+ *     - `favorites.add-to-cart` passes `productId` (ctaPortalProps).
+ *     - `favorites.product-name.after` passes the id as **`id`** (commonPortalProps),
+ *       NOT `productId` — so we normalise `productId = props.productId || props.id`
+ *       to resolve the correct *per-item* product on the favourites list (without
+ *       it, every item would fall back to the route product). When neither is
+ *       present we pass props unchanged so route resolution still works.
+ * - **`isTablet`** lets the phone bottom-bar guard stand down on tablet, where
+ *   the add-to-cart lives in the right column (see AvailabilityBarTablet).
  * @param {Object} state The current application state.
- * @param {Object} props The current component props (incl. productId from the portal).
+ * @param {Object} props The current component props (portal props).
  * @return {Object} The populated component props.
  */
-const mapStateToProps = (state, props) => ({
-  product: getProduct(state, props),
-  isTablet: (getDeviceInformation(state) || {}).type === 'tablet',
-});
+const mapStateToProps = (state, props) => {
+  const productId = props.productId || props.id;
+
+  return {
+    product: getProduct(state, productId ? { ...props, productId } : props),
+    isTablet: (getDeviceInformation(state) || {}).type === 'tablet',
+  };
+};
 
 export default connect(mapStateToProps);

@@ -6,21 +6,41 @@
  */
 
 /**
+ * Parses `firstAvailableDate` into a Date.
+ *
+ * A date-only string (`"YYYY-MM-DD"`) is parsed as **local** midnight — note
+ * `new Date("YYYY-MM-DD")` would parse it as UTC midnight, which (combined with
+ * the local `Date.now()` comparison and `toLocaleDateString` display) can shift
+ * availability by a day depending on the device timezone. Full datetime strings
+ * (with time/offset) are passed through to the native parser unchanged.
+ * @param {string} value The raw `firstAvailableDate`.
+ * @returns {Date|null} A valid Date, or null.
+ */
+const parseAvailableDate = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  let date;
+  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split('-').map(Number);
+    date = new Date(year, month - 1, day);
+  } else {
+    date = new Date(value);
+  }
+
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+/**
  * Whether a product is "coming soon" — its first availability lies in the future.
  * @param {Object} product Product or selected-variant data.
  * @returns {boolean}
  */
 export const isComingSoon = (product) => {
-  if (!product || !product.firstAvailableDate) {
-    return false;
-  }
+  const date = product ? parseAvailableDate(product.firstAvailableDate) : null;
 
-  const timestamp = new Date(product.firstAvailableDate).getTime();
-  if (Number.isNaN(timestamp)) {
-    return false;
-  }
-
-  return timestamp > Date.now();
+  return !!date && date.getTime() > Date.now();
 };
 
 /**
@@ -30,12 +50,8 @@ export const isComingSoon = (product) => {
  * @returns {string} Localised date, or empty string if unavailable/invalid.
  */
 export const formatAvailableDate = (product, locale) => {
-  if (!product || !product.firstAvailableDate) {
-    return '';
-  }
-
-  const date = new Date(product.firstAvailableDate);
-  if (Number.isNaN(date.getTime())) {
+  const date = product ? parseAvailableDate(product.firstAvailableDate) : null;
+  if (!date) {
     return '';
   }
 

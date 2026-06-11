@@ -1,7 +1,7 @@
 {
   "name": "@shopgate-project/ext-coming-soon",
   "version": "1.0.0",
-  "description": "An awesome extesion for my awesome organization",
+  "description": "Coming Soon — hide add-to-cart and show an availability bar for products with a future firstAvailableDate (phone + tablet).",
   "license": "Apache-2.0",
   "scripts": {
     "test": "jest",

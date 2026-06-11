@@ -82,6 +82,12 @@ additive `product.add-to-cart-bar.before` slot and hides the real bar
 (`.theme__product__add-to-cart-bar`) via a scoped style only while a coming-soon
 product is shown. Verified working with `ext-tablet-adjustments` installed.
 
+> **Known risk:** the hide depends on the theme CSS class
+> `.theme__product__add-to-cart-bar`. If a future theme renames it, the real
+> bar would no longer be hidden (both bars visible → product orderable).
+> Verified against **theme-ios11 7.30.4**; re-check the selector when bumping
+> the theme.
+
 ### Styling
 
 The bars mirror the corresponding theme add-to-cart button 1:1 — colours,
@@ -135,9 +141,14 @@ Unit specs (`*.spec.js[x]`) follow the standard Shopgate jest/enzyme setup
 
 ## Open items before production
 
-1. **Variant-level vs product-level availability** — clarify whether the date
+1. **Favourites payload:** the per-item product is now resolved via the slot's
+   `id`/`productId` prop (fixed). Still confirm that the favourites list pipeline
+   (`getProductsByIds`) actually delivers `firstAvailableDate` per item — verify
+   on a real coming-soon product (the sandbox test products have no date set).
+2. **Variant-level vs product-level availability** — clarify whether the date
    differs per variant.
-2. **Timezone:** the future-check uses device-local time; confirm that matches
-   the merchant's intent.
-3. **Scope:** PDP + favourites only. PLP add-to-cart, product sliders and cart
+3. **Timezone:** date-only values (`"YYYY-MM-DD"`) are parsed as local midnight
+   to avoid a UTC off-by-one; confirm the desired switch-over moment if the
+   catalog ever sends full timestamps.
+4. **Scope:** PDP + favourites only. PLP add-to-cart, product sliders and cart
    are out of scope — confirm.

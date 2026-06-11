@@ -24,6 +24,13 @@ describe('isComingSoon()', () => {
   it('is false for an invalid date', () => {
     expect(isComingSoon({ firstAvailableDate: 'not-a-date' })).toBe(false);
   });
+
+  it('handles a date-only string as local time (no UTC off-by-one)', () => {
+    const futureYear = new Date().getFullYear() + 2;
+    const pastYear = new Date().getFullYear() - 2;
+    expect(isComingSoon({ firstAvailableDate: `${futureYear}-01-01` })).toBe(true);
+    expect(isComingSoon({ firstAvailableDate: `${pastYear}-01-01` })).toBe(false);
+  });
 });
 
 describe('formatAvailableDate()', () => {

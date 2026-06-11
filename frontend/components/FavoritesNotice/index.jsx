@@ -1,13 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import I18n from '@shopgate/pwa-common/components/I18n';
+import { themeConfig } from '@shopgate/pwa-common/helpers/config';
 import { formatAvailableDate } from '../../helpers/isComingSoon';
+
+const { colors } = themeConfig;
 
 const styles = {
   notice: {
     marginTop: 4,
     fontSize: 13,
-    color: '#664d03',
+    color: colors.cta,
     fontWeight: 600,
   },
 };
