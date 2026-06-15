@@ -10,6 +10,7 @@ import ComingSoonBarTablet from '../../components/ComingSoonBarTablet';
  * Shows the greyed availability bar for coming-soon products; otherwise renders
  * the original tablet add-to-cart button (children).
  * @param {Object} props Props (incl. children + productId from the portal).
+ * @returns {JSX.Element} The availability bar or the original children.
  */
 const AvailabilityBarTablet = ({ product, children }) => {
   if (isComingSoon(product)) {

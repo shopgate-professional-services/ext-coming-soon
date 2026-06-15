@@ -3,10 +3,17 @@ import PropTypes from 'prop-types';
 import I18n from '@shopgate/pwa-common/components/I18n';
 import { themeConfig } from '@shopgate/pwa-common/helpers/config';
 import { formatAvailableDate } from '../../helpers/isComingSoon';
-import { barOpacity } from '../../helpers/barOpacity';
+import { comingSoonBarOpacity } from '../../config';
 
 const { colors, variables, shadows } = themeConfig;
 const barHeight = 46;
+
+// Admin-configurable greyness (0–1), parsed + clamped locally; falls back to 0.6
+// when unset. The Developer Center may deliver the value as a string.
+const parsedOpacity = parseFloat(comingSoonBarOpacity);
+const opacity = Number.isFinite(parsedOpacity)
+  ? Math.min(1, Math.max(0, parsedOpacity))
+  : 0.6;
 
 /**
  * Mirrors the theme's add-to-cart bar 1:1 so height, insets, shadow and
@@ -45,7 +52,7 @@ const styles = {
     fontWeight: 700,
     borderRadius: 5,
     padding: `${(variables.gap.big * 0.75) - 1}px ${variables.gap.big * 0.6}px ${(variables.gap.big * 0.75) + 1}px`,
-    opacity: barOpacity,
+    opacity,
     cursor: 'not-allowed',
   },
 };
@@ -55,6 +62,7 @@ const styles = {
  * Visually identical to the add-to-cart bar, just greyed out.
  * @param {Object} props Component props.
  * @param {Object} props.product Product or selected-variant data.
+ * @returns {JSX.Element} The greyed availability bar.
  */
 const ComingSoonBar = ({ product }) => (
   <div className="coming-soon-bar" style={styles.container} data-test-id="comingSoonBar">
@@ -62,7 +70,7 @@ const ComingSoonBar = ({ product }) => (
       <div style={styles.base}>
         <div style={styles.button}>
           <I18n.Text
-            string="ext-coming-soon.available_on"
+            string="comingSoon.available_on"
             params={{ date: formatAvailableDate(product) }}
           />
         </div>

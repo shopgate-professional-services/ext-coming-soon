@@ -6,6 +6,10 @@ const DAY = 24 * 60 * 60 * 1000;
 const future = new Date(Date.now() + 30 * DAY).toISOString();
 const past = new Date(Date.now() - 30 * DAY).toISOString();
 
+/**
+ * Stub coming-soon renderer for the tests.
+ * @returns {JSX.Element} A marker node.
+ */
 const renderComingSoon = () => <div className="coming-soon">soon</div>;
 
 describe('<ComingSoonGuard />', () => {

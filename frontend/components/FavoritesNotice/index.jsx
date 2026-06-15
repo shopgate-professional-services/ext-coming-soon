@@ -20,6 +20,7 @@ const styles = {
  * favourites list (additive slot — rendered only for coming-soon items).
  * @param {Object} props Component props.
  * @param {Object} props.product Product or selected-variant data.
+ * @returns {JSX.Element} The availability notice.
  */
 const FavoritesNotice = ({ product }) => (
   <div
@@ -28,7 +29,7 @@ const FavoritesNotice = ({ product }) => (
     data-test-id="comingSoonFavNotice"
   >
     <I18n.Text
-      string="ext-coming-soon.available_on"
+      string="comingSoon.available_on"
       params={{ date: formatAvailableDate(product) }}
     />
   </div>

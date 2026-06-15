@@ -22,9 +22,15 @@ import { getDeviceInformation } from '@shopgate/pwa-common/selectors/client';
  */
 const mapStateToProps = (state, props) => {
   const productId = props.productId || props.id;
+  const productProps = productId
+    ? {
+      ...props,
+      productId,
+    }
+    : props;
 
   return {
-    product: getProduct(state, productId ? { ...props, productId } : props),
+    product: getProduct(state, productProps),
     isTablet: (getDeviceInformation(state) || {}).type === 'tablet',
   };
 };

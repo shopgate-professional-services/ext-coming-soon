@@ -3,9 +3,16 @@ import PropTypes from 'prop-types';
 import I18n from '@shopgate/pwa-common/components/I18n';
 import { themeConfig } from '@shopgate/pwa-common/helpers/config';
 import { formatAvailableDate } from '../../helpers/isComingSoon';
-import { barOpacity } from '../../helpers/barOpacity';
+import { comingSoonBarOpacity } from '../../config';
 
 const { colors } = themeConfig;
+
+// Admin-configurable greyness (0–1), parsed + clamped locally; falls back to 0.6
+// when unset. The Developer Center may deliver the value as a string.
+const parsedOpacity = parseFloat(comingSoonBarOpacity);
+const opacity = Number.isFinite(parsedOpacity)
+  ? Math.min(1, Math.max(0, parsedOpacity))
+  : 0.6;
 
 /**
  * Mirrors the tablet right-column add-to-cart button
@@ -26,7 +33,7 @@ const styles = {
     fontWeight: 700,
     borderRadius: 5,
     padding: 16,
-    opacity: barOpacity,
+    opacity,
     cursor: 'not-allowed',
   },
 };
@@ -36,6 +43,7 @@ const styles = {
  * right-column add-to-cart button. Styled identically to that button, greyed.
  * @param {Object} props Component props.
  * @param {Object} props.product Product or selected-variant data.
+ * @returns {JSX.Element} The greyed tablet availability bar.
  */
 const ComingSoonBarTablet = ({ product }) => (
   <div
@@ -44,7 +52,7 @@ const ComingSoonBarTablet = ({ product }) => (
     data-test-id="comingSoonBarTablet"
   >
     <I18n.Text
-      string="ext-coming-soon.available_on"
+      string="comingSoon.available_on"
       params={{ date: formatAvailableDate(product) }}
     />
   </div>
