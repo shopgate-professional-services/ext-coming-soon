@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 import I18n from '@shopgate/pwa-common/components/I18n';
 import { themeConfig } from '@shopgate/pwa-common/helpers/config';
 import { formatAvailableDate } from '../../helpers/isComingSoon';
-import { comingSoonBarOpacity } from '../../config';
+import config from '../../config.json';
 
 const { colors, variables, shadows } = themeConfig;
 const barHeight = 46;
 
 // Admin-configurable greyness (0–1), parsed + clamped locally; falls back to 0.6
 // when unset. The Developer Center may deliver the value as a string.
-const parsedOpacity = parseFloat(comingSoonBarOpacity);
+const parsedOpacity = parseFloat(config.comingSoonBarOpacity);
 const opacity = Number.isFinite(parsedOpacity)
   ? Math.min(1, Math.max(0, parsedOpacity))
   : 0.6;

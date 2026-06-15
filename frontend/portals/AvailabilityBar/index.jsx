@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import connect from '../../connector';
 import { isComingSoon } from '../../helpers/isComingSoon';
@@ -27,10 +27,10 @@ const AvailabilityBar = ({ product, isTablet }) => {
   }
 
   return (
-    <Fragment>
+    <>
       <style>{'.theme__product__add-to-cart-bar{display:none!important}'}</style>
       <ComingSoonBar product={product} />
-    </Fragment>
+    </>
   );
 };
 

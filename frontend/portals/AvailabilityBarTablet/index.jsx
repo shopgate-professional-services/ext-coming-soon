@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import connect from '../../connector';
 import { isComingSoon } from '../../helpers/isComingSoon';
 import ComingSoonBarTablet from '../../components/ComingSoonBarTablet';
@@ -17,6 +18,16 @@ const AvailabilityBarTablet = ({ product, children }) => {
     return <ComingSoonBarTablet product={product} />;
   }
   return children;
+};
+
+AvailabilityBarTablet.propTypes = {
+  children: PropTypes.node,
+  product: PropTypes.shape(),
+};
+
+AvailabilityBarTablet.defaultProps = {
+  children: null,
+  product: null,
 };
 
 export default connect(AvailabilityBarTablet);
