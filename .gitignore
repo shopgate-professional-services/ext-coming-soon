@@ -141,3 +141,10 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Shopgate — SDK-generated config (NEVER commit; regenerated on `sgconnect … start`)
+**/config.json
+**/package-lock.json
+
+# OS files
+.DS_Store
